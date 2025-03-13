@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { prisma } from "../config/prismaConfig";
+import { prisma } from "../config/prismaConfig.js";
 export const protectRoute = async (req, res, next) => {
   try {
     //retrieve token from cookies
@@ -26,5 +26,8 @@ export const protectRoute = async (req, res, next) => {
     //if the user is found
     req.user = user;
     next();
-  } catch (error) {}
+  } catch (error) {
+    console.log(`Error in protectRoute middleware`, error.message);
+    res.status(500).json({ error: error.message });
+  }
 };
