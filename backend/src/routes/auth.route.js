@@ -70,6 +70,40 @@ router.post(
   }
 );
 
-router.post("/login", async (req, res) => {});
+router.post(
+  "/login",
+  [body("email").isEmail().withMessage("Invalid email address")],
+  async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password)
+      return res.status(400).json({ error: "All fields are required" });
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      return res
+        .status(400)
+        .json({ error: errors.array().map((err) => err.msg) });
+
+    const userExist = await prisma.user.findFirst({ where: { email } });
+
+    if (!userExist) return res.status(404).json({ error: "Email not found" });
+
+    //if the email is found
+    const comparepassword = await bcrypt.compare(password, userExist.password);
+
+    if (!comparepassword)
+      return res
+        .status(400)
+        .json({ error: "Password didn't match our records" });
+
+    //if the password matches
+    generateJWTAndSetCookie(userExist, res);
+
+    return res
+      .status(200)
+      .json({ success: true, message: `${email} LoggedIn successfully` });
+  }
+);
 
 export { router as authRoutes };
