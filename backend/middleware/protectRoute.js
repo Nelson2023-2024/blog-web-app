@@ -3,7 +3,7 @@ import { prisma } from "../config/prismaConfig.js";
 export const protectRoute = async (req, res, next) => {
   try {
     //retrieve token from cookies
-    const token = req.cookies.jwt;
+    const token = req.cookies?.jwt;
 
     if (!token)
       return res.status(401).json({ error: "Unauthorized no token provided" });
@@ -15,8 +15,10 @@ export const protectRoute = async (req, res, next) => {
     if (!decoded)
       return res.status(401).json({ message: "Unauthorized - Invalid Token" });
 
+    
     //find the user in the DB
-    const user = await prisma.user.findFirst({ where: { id: decoded.userId } });
+    const user = await prisma.user.findFirst({ where: { id: decoded.userId.id } });
+    console.log("Authenitated User:", user);
 
     if (!user)
       return res
