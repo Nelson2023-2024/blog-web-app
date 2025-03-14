@@ -73,7 +73,50 @@ router.get("/get-blogs", async (req, res) => {
   }
 });
 
-router.put("/update-blog/:id", async (req, res) => {});
+router.put("/update-blog/:id", async (req, res) => {
+  const { id: blogId } = req.params;
+  const { title, content, featuredImg } = req.body;
+
+  try {
+    // Check if the blog exists
+    const blogPost = await prisma.post.findUnique({ where: { id: blogId } });
+    if (!blogPost) {
+      return res.status(404).json({ success: false, error: "Blog not found" });
+    }
+
+    // Prepare the update data
+    let updatedFeaturedImg = blogPost.featuredImg;
+
+    // If a new featuredImg is provided, upload it and get the new URL
+    if (featuredImg) {
+      const uploadImage = await cloudinary.uploader.upload(featuredImg);
+      updatedFeaturedImg = uploadImage.secure_url;
+    }
+
+    // Update the blog post
+    const updatedBlog = await prisma.post.update({
+      where: { id: blogId },
+      data: {
+        title: title || blogPost.title,
+        content: content || blogPost.content,
+        featuredImg: updatedFeaturedImg,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Blog updated successfully",
+      data: updatedBlog,
+    });
+  } catch (error) {
+    console.error("Error updating blog:", error);
+    return res.status(500).json({
+      success: false,
+      error: "Internal Server Error",
+      message: error.message,
+    });
+  }
+});
 
 router.delete("/delete-blog/:id", async (req, res) => {
   const { id: blogId } = req.params;
@@ -96,13 +139,11 @@ router.delete("/delete-blog/:id", async (req, res) => {
     });
   } catch (error) {
     console.error("Error deleting blog:", error);
-    return res
-      .status(500)
-      .json({
-        success: false,
-        error: "Internal Server Error",
-        message: error.message,
-      });
+    return res.status(500).json({
+      success: false,
+      error: "Internal Server Error",
+      message: error.message,
+    });
   }
 });
 export { router as blogPostRoute };
