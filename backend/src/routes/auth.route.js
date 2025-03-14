@@ -3,6 +3,7 @@ import { body, validationResult } from "express-validator";
 import { prisma } from "../../config/prismaConfig.js";
 import bcrypt from "bcrypt";
 import { generateJWTAndSetCookie } from "../../utils/createJWTAndSetCookie.js";
+import { protectRoute } from "../../middleware/protectRoute.js";
 
 const router = Router();
 
@@ -122,6 +123,16 @@ router.post("/logout", async (req, res) => {
     res.status(200).json({ message: "Logout successfully" });
   } catch (error) {
     console.error("An error occurred in logout controller", error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+//get the currently authenticated user
+router.get("/me", protectRoute, async (req, res) => {
+  try {
+    return res.status(200).json({ success: true, user: req.user });
+  } catch (error) {
+    console.error("An error occurred in me controller", error);
     return res.status(500).json({ error: error.message });
   }
 });
