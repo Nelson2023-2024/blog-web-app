@@ -1,13 +1,60 @@
-import React from "react";
+import { useMutation } from "@tanstack/react-query";
+import React, { useState } from "react";
+import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 
 const Login = () => {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const {
+    isPending,
+    isError,
+    error,
+    mutate: loginMutation,
+  } = useMutation({
+    mutationFn: async ({ email, password }) => {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.error) {
+        throw new Error(data.error || "Something went wrong");
+      }
+      console.log(data);
+
+      return data;
+    },
+    onSuccess: async () => {
+      toast.success(`Loggin successful`);
+      setFormData({
+        email: "",
+        password: "",
+      });
+    },
+    onError: async (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    loginMutation(formData);
+  };
   return (
     <div className="flex flex-col items-center justify-center mx-auto min-w-96 h-full ">
       <div className="p-6 border w-[450px] mx-auto bg-gray-100 rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-0 border-gray-100">
         <h1 className="text-3xl font-semibold text-center mb-3">Login</h1>
 
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="flex justify-center flex-col">
             <label className="input mx-auto mb-2.5 w-[100%]">
               <svg
@@ -26,7 +73,14 @@ const Login = () => {
                   <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
                 </g>
               </svg>
-              <input type="search" required placeholder="Email" />
+              <input
+                type="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+              />
             </label>
 
             <label className="input mx-auto mb-2.5 w-[100%]">
@@ -51,18 +105,40 @@ const Login = () => {
                   ></circle>
                 </g>
               </svg>
-              <input type="search" required placeholder="Password" />
+              <input
+                type="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+              />
             </label>
           </div>
           {/* button */}
-          <div className="flex justify-center">
-            <button className="btn btn-info w-[100%]">Register</button>
+          <div className="flex justify-center flex-col">
+            <button disabled={isPending} className="btn btn-info w-[100%]">
+              {isPending ? (
+                <span className="loading loading-spinner loading-lg"></span>
+              ) : (
+                "Login"
+              )}
+            </button>
+
+            {isError && (
+              <p className="text-red-500 text-[12px] mt-2 text-center">
+                {error.message}
+              </p>
+            )}
           </div>
 
           {/* text */}
           <div>
             <p className="text-center mt-3 text-[12px]">
-              Don't have an account ? <Link to={"/signup"} className="text-purple-600">SignUp</Link>
+              Don't have an account ?{" "}
+              <Link to={"/signup"} className="text-purple-600">
+                SignUp
+              </Link>
             </p>
           </div>
         </form>
