@@ -73,6 +73,35 @@ router.get("/get-blogs", async (req, res) => {
   }
 });
 
+//get specific blog-post via ID
+router.get("/get-blog/:id", async (req, res) => {
+  const { id: blogId } = req.params;
+  try {
+    const blog = await prisma.post.findUnique({
+      where: { id: blogId },
+      select: {
+        author: true,
+        content: true,
+        createdAt: true,
+        title: true,
+        featuredImg: true,
+        likes: true,
+        id: true,
+        _count: true,
+      },
+    });
+
+    if (!blog)
+      return res.status(404).json({ error: "Blog not found", success: false });
+
+    //if the blog if found
+    return res.status(200).json({ success: true, data: blog });
+  } catch (error) {
+    console.log("Error in /get-blog/:id controller", error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 router.put("/update-blog/:id", async (req, res) => {
   const { id: blogId } = req.params;
   const { title, content, featuredImg } = req.body;
