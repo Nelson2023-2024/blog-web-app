@@ -104,18 +104,26 @@ router.post(
       //if the password matches
       generateJWTAndSetCookie(userExist, res);
 
-      return res
-        .status(200)
-        .json({
-          success: true,
-          message: `${email} LoggedIn successfully`,
-          data: userExist,
-        });
+      return res.status(200).json({
+        success: true,
+        message: `${email} LoggedIn successfully`,
+        data: userExist,
+      });
     } catch (error) {
       console.error("An error occurred in login controller", error);
       return res.status(500).json({ error: error.message });
     }
   }
 );
+
+router.post("/logout", async (req, res) => {
+  try {
+    res.cookie("jwt", "", { maxAge: 0 });
+    res.status(200).json({ message: "Logout successfully" });
+  } catch (error) {
+    console.error("An error occurred in logout controller", error);
+    return res.status(500).json({ error: error.message });
+  }
+});
 
 export { router as authRoutes };
