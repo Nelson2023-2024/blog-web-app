@@ -56,5 +56,5 @@ model Like {
   Post   Post?   @relation(fields: [postId], references: [id])
   postId String?
 
-  @@unique([userId, postId]) //Ensures a user can like a post only once
+  @@unique([userId, postId]) //Ensures a user can like a post only once //Composite unique key (userId_postId)
 }
