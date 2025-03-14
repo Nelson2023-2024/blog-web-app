@@ -72,4 +72,37 @@ router.get("/get-blogs", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+router.put("/update-blog/:id", async (req, res) => {});
+
+router.delete("/delete-blog/:id", async (req, res) => {
+  const { id: blogId } = req.params;
+
+  try {
+    //check if it exists in the DB
+    let blogPost = await prisma.post.findFirst({ where: { id: blogId } });
+
+    if (!blogPost)
+      return res.status(404).json({ success: false, error: "Blog not found" });
+
+    // Delete the blog post
+    const deletedBlog = await prisma.post.delete({ where: { id: blogId } });
+
+    // Return a success response with the deleted blog details
+    return res.status(200).json({
+      success: true,
+      data: deletedBlog,
+      message: "Blog deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting blog:", error);
+    return res
+      .status(500)
+      .json({
+        success: false,
+        error: "Internal Server Error",
+        message: error.message,
+      });
+  }
+});
 export { router as blogPostRoute };
