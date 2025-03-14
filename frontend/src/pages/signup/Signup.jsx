@@ -1,13 +1,75 @@
-import React from "react";
+import { useMutation } from "@tanstack/react-query";
+import React, { useState } from "react";
+import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 
 const Signup = () => {
+  const [formData, setFormData] = useState({
+    email: "",
+    userName: "",
+    fullName: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  //for CUD
+  const { mutate, isError, isPending, error } = useMutation({
+    mutationFn: async ({
+      email,
+      userName,
+      fullName,
+      password,
+      confirmPassword,
+    }) => {
+      try {
+        const response = await fetch(`/api/auth/signup`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            userName,
+            fullName,
+            password,
+            confirmPassword,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || data.error) {
+          throw new Error(data.error || "Something went wrong");
+        }
+
+        return data;
+      } catch (error) {
+        console.error(error);
+        toast.error(error.message);
+      }
+    },
+    onSuccess: () => {
+      toast.success("Signed up successfully!");
+      setFormData({
+        email: "",
+        userName: "",
+        fullName: "",
+        password: "",
+        confirmPassword: "",
+      }); // Reset form
+    },
+  });
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(formData);
+    mutate(formData);
+  };
   return (
     <div className="flex flex-col items-center justify-center mx-auto min-w-96 h-full ">
       <div className="p-6 border w-[450px] mx-auto bg-gray-100 rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-0 border-gray-100">
         <h1 className="text-3xl font-semibold text-center mb-3">Sign Up</h1>
 
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="flex justify-center flex-col">
             <label className="input mx-auto mb-2.5 w-[100%]">
               <svg
@@ -26,7 +88,15 @@ const Signup = () => {
                   <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
                 </g>
               </svg>
-              <input type="search" required placeholder="Email" />
+              <input
+                type="email"
+                required
+                placeholder="Email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+              />
             </label>
 
             <label className="input mx-auto mb-2.5 w-[100%]">
@@ -46,7 +116,15 @@ const Signup = () => {
                   <circle cx="12" cy="7" r="4"></circle>
                 </g>
               </svg>
-              <input type="search" required placeholder="Fullname" />
+              <input
+                type="text"
+                required
+                placeholder="Fullname"
+                value={formData.fullName}
+                onChange={(e) => {
+                  setFormData({ ...formData, fullName: e.target.value });
+                }}
+              />
             </label>
 
             <label className="input mx-auto mb-2.5 w-[100%]">
@@ -66,7 +144,15 @@ const Signup = () => {
                   <circle cx="12" cy="7" r="4"></circle>
                 </g>
               </svg>
-              <input type="search" required placeholder="Username" />
+              <input
+                type="text"
+                required
+                placeholder="Username"
+                value={formData.userName}
+                onChange={(e) => {
+                  setFormData({ ...formData, userName: e.target.value });
+                }}
+              />
             </label>
 
             <label className="input mx-auto mb-2.5 w-[100%]">
@@ -91,7 +177,15 @@ const Signup = () => {
                   ></circle>
                 </g>
               </svg>
-              <input type="search" required placeholder="Password" />
+              <input
+                type="password"
+                required
+                placeholder="Password"
+                value={formData.password}
+                onChange={(e) => {
+                  setFormData({ ...formData, password: e.target.value });
+                }}
+              />
             </label>
 
             <label className="input mx-auto mb-2.5 w-[100%]">
@@ -116,12 +210,33 @@ const Signup = () => {
                   ></circle>
                 </g>
               </svg>
-              <input type="search" required placeholder="Confirm Password" />
+              <input
+                type="password"
+                required
+                placeholder="Confirm Password"
+                value={formData.confirmPassword}
+                onChange={(e) => {
+                  setFormData({ ...formData, confirmPassword: e.target.value });
+                }}
+              />
             </label>
           </div>
           {/* button */}
-          <div className="flex justify-center">
-            <button className="btn btn-info w-[100%]">Register</button>
+
+          <div className="flex justify-center flex-col">
+            <button disabled={isPending} className="btn btn-info w-[100%]">
+              {isPending ? (
+                <span className="loading loading-spinner loading-lg"></span>
+              ) : (
+                "Register"
+              )}
+            </button>
+
+            {isError && (
+              <p className="text-red-500 text-[12px] mt-2 text-center">
+                {error.message}
+              </p>
+            )}
           </div>
 
           <div>
