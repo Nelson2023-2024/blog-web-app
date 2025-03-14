@@ -21,32 +21,27 @@ const Signup = () => {
       password,
       confirmPassword,
     }) => {
-      try {
-        const response = await fetch(`/api/auth/signup`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email,
-            userName,
-            fullName,
-            password,
-            confirmPassword,
-          }),
-        });
+      const response = await fetch(`/api/auth/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          userName,
+          fullName,
+          password,
+          confirmPassword,
+        }),
+      });
 
-        const data = await response.json();
+      const data = await response.json();
 
-        if (!response.ok || data.error) {
-          throw new Error(data.error || "Something went wrong");
-        }
-
-        return data;
-      } catch (error) {
-        console.error(error);
-        toast.error(error.message);
+      if (!response.ok || data.error) {
+        throw new Error(data.error || "Something went wrong");
       }
+
+      return data;
     },
     onSuccess: () => {
       toast.success("Signed up successfully!");
@@ -57,6 +52,9 @@ const Signup = () => {
         password: "",
         confirmPassword: "",
       }); // Reset form
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
   const handleSubmit = (e) => {
@@ -90,7 +88,6 @@ const Signup = () => {
               </svg>
               <input
                 type="email"
-                required
                 placeholder="Email"
                 value={formData.email}
                 onChange={(e) =>
@@ -118,7 +115,6 @@ const Signup = () => {
               </svg>
               <input
                 type="text"
-                required
                 placeholder="Fullname"
                 value={formData.fullName}
                 onChange={(e) => {
@@ -146,7 +142,6 @@ const Signup = () => {
               </svg>
               <input
                 type="text"
-                required
                 placeholder="Username"
                 value={formData.userName}
                 onChange={(e) => {
@@ -179,7 +174,6 @@ const Signup = () => {
               </svg>
               <input
                 type="password"
-                required
                 placeholder="Password"
                 value={formData.password}
                 onChange={(e) => {
@@ -212,7 +206,6 @@ const Signup = () => {
               </svg>
               <input
                 type="password"
-                required
                 placeholder="Confirm Password"
                 value={formData.confirmPassword}
                 onChange={(e) => {
