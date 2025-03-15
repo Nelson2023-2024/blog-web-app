@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
@@ -8,6 +8,8 @@ const Login = () => {
     email: "",
     password: "",
   });
+
+  const queryClient = useQueryClient();
 
   const {
     isPending,
@@ -34,11 +36,12 @@ const Login = () => {
       return data;
     },
     onSuccess: async () => {
-      toast.success(`Loggin successful`);
       setFormData({
         email: "",
         password: "",
       });
+
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
     onError: async (error) => {
       toast.error(error.message);
