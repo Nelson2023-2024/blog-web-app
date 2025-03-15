@@ -6,7 +6,7 @@ import {
 import React from "react";
 import toast from "react-hot-toast";
 import { FiLogOut } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 const Navbar = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -38,7 +38,7 @@ const Navbar = () => {
 
       // Remove all cached queries
       queryClient.removeQueries();
-      
+
       // Redirect to login
       navigate("/login");
     },
@@ -52,9 +52,9 @@ const Navbar = () => {
   };
   return (
     <>
-      <div className="navbar bg-base-100 shadow-sm">
+      <div className="navbar bg-base-100 shadow-sm sticky px-11">
         <div className="flex-1">
-          <a className=" text-xl">daisyUI</a>
+          <Link to={"/"} className="font-bold text-2xl">BlogApp</Link>
         </div>
         <div className="flex-none">
           <ul className="menu menu-horizontal px-1">
@@ -63,10 +63,8 @@ const Navbar = () => {
             </li>
             <li>
               {isPending ? (
-                <button
-                className="p-2 hover:bg-gray-100 rounded"
-              >
-                <span className="loading loading-spinner loading-md"></span>
+                <button className="p-2 hover:bg-gray-100 rounded">
+                  <span className="loading loading-spinner loading-md"></span>
                 </button>
               ) : (
                 <button

@@ -34,7 +34,7 @@ function App() {
     );
   return (
     <>
-      <div className="bg-[#eee] h-screen w-[90%] mx-auto">
+      <div className="bg-[#eee] h-screen">
         {authUser && <Navbar />}
         <Routes>
           <Route
