@@ -5,26 +5,12 @@ import Login from "./pages/login/Login";
 import { useQuery } from "@tanstack/react-query";
 import Home from "./pages/home/Home";
 import Navbar from "./components/Navbar";
+import { useAuth } from "./hooks/useAuth";
 
 function App() {
-  const { data: authUser, isLoading } = useQuery({
-    queryKey: ["authUser"],
-    queryFn: async () => {
-      try {
-        const response = await fetch("/api/auth/me");
-        const data = await response.json();
+  const { data: authUser, isLoading } = useAuth();
 
-        if (!response.ok || data.error)
-          throw new Error(data.error || "Something went wrong");
-
-        console.log(`Authuser:`, data);
-        return data;
-      } catch (error) {
-        toast.error(error.message);
-        return null;
-      }
-    },
-  });
+  console.log("AuthUser", authUser);
 
   if (isLoading)
     return (

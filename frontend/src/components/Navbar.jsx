@@ -54,7 +54,7 @@ const Navbar = () => {
     <>
       <div className="navbar bg-base-100 shadow-sm sticky px-11">
         <div className="flex-1">
-          <Link to={"/"} className="font-bold text-2xl">BlogApp</Link>
+          <Link to={"/"} className="font-bold text-2xl">TechPulse Daily</Link>
         </div>
         <div className="flex-none">
           <ul className="menu menu-horizontal px-1">
