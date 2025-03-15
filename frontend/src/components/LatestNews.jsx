@@ -5,14 +5,23 @@ import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useAuth } from "../hooks/useAuth";
 import useBlogData from "../hooks/useBlogData";
+import { useDeleteBlog } from "../hooks/useDeleteBlog";
 
 const LatestNews = () => {
   const { data: authUser } = useAuth();
 
   const { data: blogData, isLoading, isError } = useBlogData();
 
-   // Improved loading state
-   if (isLoading) {
+  const { mutate: deleteBlog, isPending } = useDeleteBlog();
+
+    const handleDeleteBlog = (id) => {
+        if (window.confirm("Are you sure you want to delete this blog post?")) {
+          deleteBlog(id);
+        }
+      };
+
+  // Improved loading state
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-200 flex items-center justify-center">
         <span className="loading loading-spinner loading-lg text-blue-600"></span>
@@ -27,7 +36,6 @@ const LatestNews = () => {
       </div>
     );
   }
-
 
   return (
     <section className="min-h-screen bg-gray-200 px-11 pt-[100px] pb-20">
@@ -61,7 +69,11 @@ const LatestNews = () => {
                     <AiOutlineLike size={20} /> {blog._count.likes}
                   </button>
                   {authUser.id === blog.author.id && (
-                    <button className="cursor-pointer flex items-center gap-2 text-pink-500">
+                    <button
+                      onClick={() => handleDeleteBlog(blog.id)}
+                      disabled={isPending}
+                      className="cursor-pointer flex items-center gap-2 text-pink-500"
+                    >
                       <MdOutlineDelete size={20} />
                     </button>
                   )}
