@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { AiOutlineLike } from "react-icons/ai";
 import { MdOutlineDelete } from "react-icons/md";
 import { useQuery } from "@tanstack/react-query";
@@ -6,19 +6,32 @@ import toast from "react-hot-toast";
 import { useAuth } from "../hooks/useAuth";
 import useBlogData from "../hooks/useBlogData";
 import { useDeleteBlog } from "../hooks/useDeleteBlog";
+import { useLikeBlog } from "../hooks/useLikeBlog";
 
 const LatestNews = () => {
   const { data: authUser } = useAuth();
+  const [likingBlogId, setLikingBlogId] = useState(null);
 
   const { data: blogData, isLoading, isError } = useBlogData();
 
   const { mutate: deleteBlog, isPending } = useDeleteBlog();
 
-    const handleDeleteBlog = (id) => {
-        if (window.confirm("Are you sure you want to delete this blog post?")) {
-          deleteBlog(id);
-        }
-      };
+  const { mutate: likeBlog, isPending: isLiking } = useLikeBlog();
+
+  const handleLikeBlog = (id) => {
+    setLikingBlogId(id);
+    likeBlog(id, {
+      onSettled: () => {
+        setLikingBlogId(null);
+      }
+    });
+  };
+
+  const handleDeleteBlog = (id) => {
+    if (window.confirm("Are you sure you want to delete this blog post?")) {
+      deleteBlog(id);
+    }
+  };
 
   // Improved loading state
   if (isLoading) {
@@ -65,8 +78,18 @@ const LatestNews = () => {
                   By {blog.author.fullName} ({blog.author.userName})
                 </div>
                 <div className="flex justify-between items-center mt-4 text-gray-400 text-sm">
-                  <button className="cursor-pointer flex items-center gap-2 text-pink-500">
-                    <AiOutlineLike size={20} /> {blog._count.likes}
+                  <button
+                    className="cursor-pointer flex items-center gap-2 text-pink-500"
+                    onClick={() => handleLikeBlog(blog.id)}
+                    disabled={likingBlogId === blog.id}
+                  >
+                    {likingBlogId === blog.id ? (
+                      <span className="loading loading-spinner loading-xs"></span>
+                    ) : (
+                      <>
+                        <AiOutlineLike size={20} /> {blog._count.likes}
+                      </>
+                    )}
                   </button>
                   {authUser.id === blog.author.id && (
                     <button
