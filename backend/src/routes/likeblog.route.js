@@ -23,21 +23,23 @@ router.post("/:id", async (req, res) => {
         userId_postId: { userId: userId, postId: blogId },
       },
     });
-    if (existingLike)
+    if (existingLike) {
+      // Unlike the post if user has already likes
+      await prisma.like.delete({ where: { id: existingLike.id } });
       return res
-        .status(400)
-        .json({ success: false, error: "Blog already liked" });
-
-    //if the user has not liked the post
-    const newLike = await prisma.like.create({
-      data: { userId, postId: blogId },
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: "Blog liked successfully",
-      data: newLike,
-    });
+        .status(200)
+        .json({ success: true, error: "Blog unliked successfully" });
+    } else {
+      //if the user has not liked the post
+      const newLike = await prisma.like.create({
+        data: { userId, postId: blogId },
+      });
+      return res.status(200).json({
+        success: true,
+        message: "Blog liked successfully",
+        data: newLike,
+      });
+    }
   } catch (error) {
     console.error("Error liking blog:", error);
     return res.status(500).json({
