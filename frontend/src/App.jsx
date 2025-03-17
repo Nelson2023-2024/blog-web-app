@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import Home from "./pages/home/Home";
 import Navbar from "./components/Navbar";
 import { useAuth } from "./hooks/useAuth";
+import BlogDetails from "./pages/BlogDetails/BlogDetails";
 
 function App() {
   const { data: authUser, isLoading } = useAuth();
@@ -34,6 +35,10 @@ function App() {
           <Route
             path="/"
             element={authUser ? <Home /> : <Navigate to={"/login"} />}
+          />
+          <Route
+            path="/blog/:id"
+            element={authUser ? <BlogDetails /> : <Navigate to={"/login"} />}
           />
         </Routes>
         <Toaster />

@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { AiOutlineLike } from "react-icons/ai";
 import { MdOutlineDelete } from "react-icons/md";
-import { useQuery } from "@tanstack/react-query";
-import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom"; // Import for navigation
 import { useAuth } from "../hooks/useAuth";
 import useBlogData from "../hooks/useBlogData";
 import { useDeleteBlog } from "../hooks/useDeleteBlog";
 import { useLikeBlog } from "../hooks/useLikeBlog";
 
 const LatestNews = () => {
+  const navigate = useNavigate(); // Initialize navigate function
   const { data: authUser } = useAuth();
   const [likingBlogId, setLikingBlogId] = useState(null);
 
@@ -16,7 +16,7 @@ const LatestNews = () => {
 
   const { mutate: deleteBlog, isPending } = useDeleteBlog();
 
-  const { mutate: likeBlog, isPending: isLiking } = useLikeBlog();
+  const { mutate: likeBlog } = useLikeBlog();
 
   const handleLikeBlog = (id) => {
     setLikingBlogId(id);
@@ -31,6 +31,11 @@ const LatestNews = () => {
     if (window.confirm("Are you sure you want to delete this blog post?")) {
       deleteBlog(id);
     }
+  };
+
+  const handleBlogClick = (id) => {
+    // Navigate to blog details page
+    navigate(`/blog/${id}`);
   };
 
   // Improved loading state
@@ -65,10 +70,14 @@ const LatestNews = () => {
               <img
                 src={blog.featuredImg || "https://via.placeholder.com/400"}
                 alt={blog.title}
-                className="w-full h-48 object-cover"
+                className="w-full h-48 object-cover cursor-pointer"
+                onClick={() => handleBlogClick(blog.id)}
               />
               <div className="p-5">
-                <h2 className="text-xl font-bold text-blue-700">
+                <h2 
+                  className="text-xl font-bold text-blue-700 cursor-pointer hover:underline"
+                  onClick={() => handleBlogClick(blog.id)}
+                >
                   {blog.title}
                 </h2>
                 <p className="text-gray-600 text-sm mt-2">
