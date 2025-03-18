@@ -23,6 +23,7 @@ function App() {
     <>
       <div className="bg-[#eee] h-screen">
         {authUser && <Navbar />}
+        
         <Routes>
           <Route
             path="/signup"
