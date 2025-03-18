@@ -7,6 +7,7 @@ import Home from "./pages/home/Home";
 import Navbar from "./components/Navbar";
 import { useAuth } from "./hooks/useAuth";
 import BlogDetails from "./pages/BlogDetails/BlogDetails";
+import Footer from "./components/Footer";
 
 function App() {
   const { data: authUser, isLoading } = useAuth();
@@ -42,6 +43,7 @@ function App() {
             element={authUser ? <BlogDetails /> : <Navigate to={"/login"} />}
           />
         </Routes>
+        <Footer/>
         <Toaster />
       </div>
     </>
